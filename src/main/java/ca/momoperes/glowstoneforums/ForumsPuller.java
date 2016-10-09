@@ -39,10 +39,12 @@ public class ForumsPuller implements Runnable {
                     String author = (String) authorObject.get("username");
                     String authorUrl = "https://forums.glowstone.net/user/" + authorObject.get("userslug");
                     String authorAvatar = "https://forums.glowstone.net" + authorObject.get("picture");
-                    ForumTopic topic = new ForumTopic(id, title, url, author, authorUrl, authorAvatar);
                     posts.add(id);
                     if (!firstRun) {
+                        String postContent = getContent((String) topicObject.get("slug"));
+                        ForumTopic topic = new ForumTopic(id, title, url, author, authorUrl, authorAvatar, postContent);
                         DiscordHook.onNewTopic(topic);
+                        Thread.sleep(5000l);
                     }
                 }
             } catch (Exception e) {
@@ -57,5 +59,19 @@ public class ForumsPuller implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    private String getContent(String slug) throws Exception {
+        String api = "https://forums.glowstone.net/api/topic/" + slug;
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpResponse response = client.execute(new HttpGet(api));
+        String content = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+        JSONObject object = (JSONObject) new JSONParser().parse(content);
+        JSONObject post = (JSONObject) ((JSONArray) object.get("posts")).get(0);
+        String postContent = ((String) post.get("content")).replaceAll("\\<[^>]*>", "");
+        if (postContent.length() > 300) {
+            postContent = postContent.substring(0, 300) + "...";
+        }
+        return postContent;
     }
 }

@@ -8,14 +8,16 @@ public class ForumTopic {
     private final String author;
     private final String authorProfile;
     private final String authorImage;
+    private final String content;
 
-    public ForumTopic(String id, String title, String url, String author, String authorProfile, String authorImage) {
+    public ForumTopic(String id, String title, String url, String author, String authorProfile, String authorImage, String content) {
         this.id = id;
         this.title = title;
         this.url = url;
         this.author = author;
         this.authorProfile = authorProfile;
         this.authorImage = authorImage;
+        this.content = content;
     }
 
     public String getId() {
@@ -40,5 +42,9 @@ public class ForumTopic {
 
     public String getAuthorImage() {
         return authorImage;
+    }
+
+    public String getContent() {
+        return content;
     }
 }
